@@ -1,17 +1,17 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
-// const isDropdownOpen = ref(false);
-// const selectedOption = ref("");
 const selectedFile = ref("");
 const contact = ref({
   name: "",
   number: "",
   email: "",
   address: "",
+  laptopType: "",
 });
-console.log(contact);
 
 // initial loading state
 const loading = ref(false);
@@ -25,45 +25,81 @@ const handleFileChange = (event) => {
   }
 };
 
+// const handleSubmit = async () => {
+//   loading.value = true;
+
+//   try {
+//     let config = {
+//       method: "post",
+//       maxBodyLength: Infinity,
+//       url: "https://testbackend-ya01.onrender.com/api/v1/users/register",
+//       headers: {
+//         ...data.getHeaders(),
+//       },
+//       data: JSON.stringify({
+//         name: contact.value.name,
+//         number: contact.value.number,
+//         email: contact.value.email,
+//         address: contact.value.address,
+//         laptopType: contact.value.laptopType,
+//         // Add more fields as needed
+//       }),
+//     };
+
+//     axios
+//       .request(config)
+//       .then((response) => {
+//         console.log(JSON.stringify(response.data));
+//       })
+//       .catch((error) => {
+//         console.log(error);
+//       });
+
+//     // Handle the response if needed
+//     console.log("API Response:", response.data);
+//   } catch (error) {
+//     console.error("Error submitting data:", error);
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
 const handleSubmit = async () => {
-  console.log(contact);
-  let self = this;
   loading.value = true;
-  let data = JSON.stringify(self.contact);
 
   try {
-    console.log(contact);
-
-    let config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://testbackend-ya01.onrender.com/api/v1/users/register",
-      headers: {
-        ...data.getHeaders(),
-      },
-      data: JSON.stringify({
-        name: contact.name,
-        number: contact.number,
-        email: contact.email,
-        address: contact.address,
-        laptopType: selected.value,
+    const response = await axios.post(
+      "https://testbackend-ya01.onrender.com/api/v1/users/register",
+      {
+        name: contact.value.name,
+        number: contact.value.number,
+        email: contact.value.email,
+        address: contact.value.address,
+        laptopType: contact.value.laptopType,
         // Add more fields as needed
-      }),
-    };
+      }
+    );
 
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // toast("Thank your for registering", {
+    //   autoClose: 3000,
+    //   theme: "light",
+    //   type: "success",
+    //   position: "top-center",
+    //   transition: "slide",
+    // });
 
-    // Handle the response if needed
+    // // clear waitlist details
+    // this.contact = {};
+
     console.log("API Response:", response.data);
-    console.log(contact);
   } catch (error) {
+    toast(error.response.data.message, {
+      autoClose: 3000,
+      theme: "light",
+      type: "error",
+      position: "top-center",
+      transition: "slide",
+    });
     console.error("Error submitting data:", error);
   } finally {
     loading.value = false;
@@ -122,6 +158,7 @@ const handleSubmit = async () => {
         <div class="contact-box">
           <h3 class="contact-box__title">Laptop Specification</h3>
           <select v-model="contact.selected" class="custom-dropdown__selected">
+            <option value="">Select Laptop Type</option>
             <option value="HP">HP</option>
             <option value="DELL">DELL</option>
             <option value="ACER">ACER</option>
