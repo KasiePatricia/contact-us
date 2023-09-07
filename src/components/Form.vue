@@ -2,8 +2,8 @@
 import { ref, computed } from "vue";
 import axios from "axios";
 
-const isDropdownOpen = ref(false);
-const selectedOption = ref("");
+// const isDropdownOpen = ref(false);
+// const selectedOption = ref("");
 const selectedFile = ref("");
 const contact = ref({
   name: "",
@@ -11,23 +11,10 @@ const contact = ref({
   email: "",
   address: "",
 });
+console.log(contact);
 
 // initial loading state
 const loading = ref(false);
-
-const toggleDropdown = () => {
-  console.log("Toggling dropdown");
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
-
-const selectOption = (option) => {
-  selectedOption.value = option;
-  isDropdownOpen.value = false;
-};
-
-const selectedOptionText = computed(() => {
-  return selectedOption.value || "Select Laptop Type";
-});
 
 // function to upload the receipt
 const handleFileChange = (event) => {
@@ -39,35 +26,43 @@ const handleFileChange = (event) => {
 };
 
 const handleSubmit = async () => {
+  console.log(contact);
   let self = this;
   loading.value = true;
   let data = JSON.stringify(self.contact);
-  let config = {
-    method: "post",
-    url: "https://testbackend-ya01.onrender.com/api/v1/users/register",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: data,
-  };
 
   try {
-    // Make a POST request here
-    const response = await axios.post(
-      //   "https://testbackend-ya01.onrender.com/api/v1/users/register",
-      //   {
-      //     name: contact.name,
-      //     number: contact.number,
-      //     email: contact.email,
-      //     address: contact.address,
-      //     laptopType: selectedOption.value,
-      //     // Add more fields as needed
-      //   }
-      config
-    );
+    console.log(contact);
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://testbackend-ya01.onrender.com/api/v1/users/register",
+      headers: {
+        ...data.getHeaders(),
+      },
+      data: JSON.stringify({
+        name: contact.name,
+        number: contact.number,
+        email: contact.email,
+        address: contact.address,
+        laptopType: selected.value,
+        // Add more fields as needed
+      }),
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     // Handle the response if needed
     console.log("API Response:", response.data);
+    console.log(contact);
   } catch (error) {
     console.error("Error submitting data:", error);
   } finally {
@@ -126,23 +121,12 @@ const handleSubmit = async () => {
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Laptop Specification</h3>
-          <div class="custom-dropdown">
-            <div class="custom-dropdown__selected" @click="toggleDropdown">
-              <span>{{ selectedOptionText }}</span>
-              <img
-                src="../assets/icons/dropdown-icon.svg"
-                class="dropdown"
-                alt="Dropdown"
-              />
-            </div>
-            <ul class="custom-dropdown__options" v-show="isDropdownOpen">
-              <li @click="selectOption('')">Select Laptop Type</li>
-              <li @click="selectOption('HP')">HP</li>
-              <li @click="selectOption('DELL')">DELL</li>
-              <li @click="selectOption('ACER')">ACER</li>
-              <li @click="selectOption('MACBOOK')">MACBOOK</li>
-            </ul>
-          </div>
+          <select v-model="contact.selected" class="custom-dropdown__selected">
+            <option value="HP">HP</option>
+            <option value="DELL">DELL</option>
+            <option value="ACER">ACER</option>
+            <option value="MACBOOK">MACBOOK</option>
+          </select>
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Upload receipt of old laptop</h3>
