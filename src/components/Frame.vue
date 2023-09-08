@@ -11,6 +11,7 @@
 @media (min-width: 769px) {
   .frame {
     display: block;
+    height: 100vh;
     flex-basis: 50%;
     width: 50%;
     object-fit: cover;

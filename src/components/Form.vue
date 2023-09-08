@@ -1,97 +1,80 @@
+<!-- <template>
+  <div>login</div>
+</template> -->
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+// eslint-disable-next-line no-undef
 
-const selectedFile = ref("");
 const contact = ref({
-  name: "",
-  number: "",
+  fullname: "",
+  phone: "",
   email: "",
   address: "",
-  laptopType: "",
+  laptop: "",
 });
 
-// initial loading state
 const loading = ref(false);
+const filePicked = ref(null);
 
-// function to upload the receipt
-const handleFileChange = (event) => {
-  const selected = event.target.files[0];
-  if (selected) {
-    selectedFile.value = selected.name;
-    console.log("Selected file:", selectedFile.value);
+const handleFile = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    filePicked.value = file.name;
+  } else {
+    filePicked.value = null;
   }
 };
 
-// const handleSubmit = async () => {
-//   loading.value = true;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { fullname, phone, email, address, laptop } = contact.value;
 
-//   try {
-//     let config = {
-//       method: "post",
-//       maxBodyLength: Infinity,
-//       url: "https://testbackend-ya01.onrender.com/api/v1/users/register",
-//       headers: {
-//         ...data.getHeaders(),
-//       },
-//       data: JSON.stringify({
-//         name: contact.value.name,
-//         number: contact.value.number,
-//         email: contact.value.email,
-//         address: contact.value.address,
-//         laptopType: contact.value.laptopType,
-//         // Add more fields as needed
-//       }),
-//     };
+  const propsParams = new URLSearchParams({
+    fullname,
+    phone,
+    email,
+    address,
+    laptop,
+  });
 
-//     axios
-//       .request(config)
-//       .then((response) => {
-//         console.log(JSON.stringify(response.data));
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//       });
+  const fileData = new FormData();
+  if (filePicked.value) {
+    // Use .value here
+    fileData.append("receipt", filePicked.value);
+  }
 
-//     // Handle the response if needed
-//     console.log("API Response:", response.data);
-//   } catch (error) {
-//     console.error("Error submitting data:", error);
-//   } finally {
-//     loading.value = false;
-//   }
-// };
-
-const handleSubmit = async () => {
   loading.value = true;
 
   try {
-    const response = await axios.post(
-      "https://testbackend-ya01.onrender.com/api/v1/users/register",
+    const response = await fetch(
+      `https://testbackend-ya01.onrender.com/api/v1/users/register?${propsParams.toString()}`,
       {
-        name: contact.value.name,
-        number: contact.value.number,
-        email: contact.value.email,
-        address: contact.value.address,
-        laptopType: contact.value.laptopType,
-        // Add more fields as needed
+        method: "POST",
+        body: fileData,
       }
     );
 
-    // toast("Thank your for registering", {
-    //   autoClose: 3000,
-    //   theme: "light",
-    //   type: "success",
-    //   position: "top-center",
-    //   transition: "slide",
-    // });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error(errorData);
+    } else {
+      const data = await response.json();
+      console.log("Here");
+      console.log(data);
+    }
+    contact.value = {};
 
-    // // clear waitlist details
-    // this.contact = {};
+    toast("Thank your for registering", {
+      autoClose: 3000,
+      theme: "light",
+      type: "success",
+      position: "top-center",
+      transition: "slide",
+    });
 
-    console.log("API Response:", response.data);
+    loading.value = false;
   } catch (error) {
     toast(error.response.data.message, {
       autoClose: 3000,
@@ -100,8 +83,7 @@ const handleSubmit = async () => {
       position: "top-center",
       transition: "slide",
     });
-    console.error("Error submitting data:", error);
-  } finally {
+    console.error(error);
     loading.value = false;
   }
 };
@@ -114,51 +96,50 @@ const handleSubmit = async () => {
         <h1 class="title">Register with us</h1>
         <p class="description">Swap your old laptop for a new one</p>
       </div>
-      <form>
+      <form @submit="handleSubmit">
         <div class="contact-box">
           <h3 class="contact-box__title">Full name</h3>
           <input
+            v-model="contact.fullname"
             type="text"
             class="contact-box__input"
             placeholder="John Doe"
-            v-model="contact.name"
             required
           />
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Phone Number</h3>
           <input
+            v-model="contact.phone"
             type="text"
             class="contact-box__input"
             placeholder="+234000000000"
-            v-model="contact.number"
             required
           />
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Email</h3>
           <input
+            v-model="contact.email"
             type="email"
             class="contact-box__input"
             placeholder="mailat@example.com"
-            v-model="contact.email"
             required
           />
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Address</h3>
           <input
+            v-model="contact.address"
             type="text"
             class="contact-box__input"
             placeholder="38 Crescent Avenue"
-            v-model="contact.address"
             required
           />
         </div>
         <div class="contact-box">
           <h3 class="contact-box__title">Laptop Specification</h3>
-          <select v-model="contact.selected" class="custom-dropdown__selected">
-            <option value="">Select Laptop Type</option>
+          <select v-model="contact.laptop" class="custom-dropdown__selected">
             <option value="HP">HP</option>
             <option value="DELL">DELL</option>
             <option value="ACER">ACER</option>
@@ -168,20 +149,25 @@ const handleSubmit = async () => {
         <div class="contact-box">
           <h3 class="contact-box__title">Upload receipt of old laptop</h3>
           <div class="contact-box__upload">
-            <img src="../assets/icons/upload.svg" class="upload" alt="upload" />
+            <img
+              src="../assets/icons/upload.svg"
+              class="upload cursor-pointer"
+              alt="upload"
+            />
             <input
               type="file"
+              class="cursor-pointer"
               style="opacity: 0; position: absolute"
-              @change="handleFileChange"
+              @change="handleFile"
             />
           </div>
-          <p>{{ selectedFile }}</p>
+          <p class="text-xs">{{ filePicked }}</p>
+          <button class="btn" :disabled="loading" type="submit">
+            <span v-if="loading" class="spinner"></span>
+            <span v-else>Submit</span>
+          </button>
         </div>
       </form>
-      <button class="btn" @click="handleSubmit" :disabled="loading">
-        <span v-if="loading" class="spinner"></span>
-        <span v-else>Submit</span>
-      </button>
     </div>
   </section>
 </template>
@@ -190,8 +176,9 @@ const handleSubmit = async () => {
 .wrapper {
   display: flex;
   background: #f9f9f9;
-  padding: 3rem 1rem 2rem;
+  padding: 3rem 1rem;
   flex-basis: 100%;
+  overflow: auto;
 }
 
 .inner-wrapper {
@@ -229,9 +216,9 @@ const handleSubmit = async () => {
 
 .contact-box__input {
   width: 100%;
-  padding: 20px 24px;
+  padding: 12px;
   border: none;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 400;
   border-radius: 0.5rem;
   background: #fff;
@@ -243,10 +230,11 @@ const handleSubmit = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 8rem;
-  padding: 20px 0;
+  width: 7rem;
+  padding: 3px 0;
   border-radius: 0.5rem;
   background: #fff;
+  cursor: pointer;
 }
 
 .contact-box__input::placeholder {
@@ -255,26 +243,29 @@ const handleSubmit = async () => {
 
 .btn {
   display: flex;
-  padding: 24px 48px;
+  padding: 20px 48px;
   justify-content: center;
   align-items: center;
   gap: 10px;
   width: 100%;
   color: #fff;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 10px;
   border-radius: 8px;
   background: #335ca6;
+  margin-top: 1rem;
+  transition: background 300ms ease-in;
 }
 
 .btn:hover {
-  border-color: #646cff;
+  background: #6d2bbd;
+  /* transform: scale(0.9); */
 }
-.btn:focus,
+/* .btn:focus,
 .btn:focus-visible {
   outline: 4px auto #bdc0ec;
-}
+} */
 
 /* dropdown */
 .custom-dropdown {
@@ -287,8 +278,9 @@ const handleSubmit = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 12px;
   border: none;
+  font-size: 0.8rem;
   border-radius: 4px;
   cursor: pointer;
   background-color: #fff;
@@ -341,7 +333,7 @@ const handleSubmit = async () => {
 
 @media (min-width: 600px) {
   .wrapper {
-    padding: 70px 50px 40px;
+    padding: 50px 50px 40px;
   }
   .inner-wrapper {
     width: 80%;
