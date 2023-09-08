@@ -145,6 +145,9 @@ const handleSubmit = async (e) => {
         <div class="contact-box">
           <h3 class="contact-box__title">Laptop Specification</h3>
           <select v-model="contact.laptop" class="custom-dropdown__selected">
+            <option value="" class="!text-[#b3b3b3]">
+              Select a laptop specification
+            </option>
             <option value="HP">HP</option>
             <option value="DELL">DELL</option>
             <option value="ACER">ACER</option>
@@ -156,7 +159,7 @@ const handleSubmit = async (e) => {
           <div class="contact-box__upload">
             <img
               src="../assets/icons/upload.svg"
-              class="upload cursor-pointer"
+              class="upload cursor-pointer w-7 h-7"
               alt="upload"
             />
             <input
@@ -237,7 +240,7 @@ const handleSubmit = async (e) => {
   justify-content: center;
   align-items: center;
   width: 7rem;
-  padding: 3px 0;
+  padding: 6px 0;
   border-radius: 0.5rem;
   background: #fff;
   cursor: pointer;
