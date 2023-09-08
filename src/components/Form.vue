@@ -223,6 +223,7 @@ const handleSubmit = async (e) => {
   border-radius: 0.5rem;
   background: #fff;
   line-height: 1.5;
+  color: black;
 }
 
 .contact-box__upload {
