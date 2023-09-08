@@ -64,7 +64,12 @@ const handleSubmit = async (e) => {
       console.log("Here");
       console.log(data);
     }
+
+    // clear the input field when after successful submission
     contact.value = {};
+
+    // Clear the filePicked ref after successful submission
+    filePicked.value = null;
 
     toast("Thank your for registering", {
       autoClose: 3000,
