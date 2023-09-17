@@ -39,6 +39,7 @@ const handleSubmit = async (e) => {
   data.append("receipt", filePicked.value);
 
   const url = "https://testbackend-ya01.onrender.com/api/v1/users/register";
+
   const params = {
     fullname,
     phone,
