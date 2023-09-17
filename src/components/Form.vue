@@ -30,6 +30,7 @@ const handleFile = (e) => {
 };
 
 const handleSubmit = async (e) => {
+  loading.value = true;
   try {
     e.preventDefault();
     const { fullname, phone, email, address, laptop } = contact.value;
@@ -52,8 +53,6 @@ const handleSubmit = async (e) => {
       url: `${url}?${new URLSearchParams(params)}`,
       data,
     };
-
-    loading.value = true;
 
     axios
       .request(config)
