@@ -47,6 +47,8 @@ Start the server
 
 **Server:** Node
 
+**HTTP Requests:** Axios
+
 ## Color Reference
 
 | Color            | Hex                                                              |
