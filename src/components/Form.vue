@@ -3,6 +3,8 @@
 </template> -->
 <script setup>
 import { ref } from "vue";
+import axios from "axios";
+import FormData from "form-data";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 // eslint-disable-next-line no-undef
@@ -21,74 +23,64 @@ const filePicked = ref(null);
 const handleFile = (e) => {
   const file = e.target.files[0];
   if (file) {
-    filePicked.value = file.name;
+    filePicked.value = file;
   } else {
     filePicked.value = null;
   }
 };
 
 const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { fullname, phone, email, address, laptop } = contact.value;
-
-  const propsParams = new URLSearchParams({
-    fullname,
-    phone,
-    email,
-    address,
-    laptop,
-  });
-
-  const fileData = new FormData();
-  if (filePicked.value) {
-    // Use .value here
-    fileData.append("receipt", filePicked.value);
-  }
-
-  loading.value = true;
-
   try {
-    const response = await fetch(
-      `https://testbackend-ya01.onrender.com/api/v1/users/register?${propsParams.toString()}`,
-      {
-        method: "POST",
-        body: fileData,
-      }
-    );
+    e.preventDefault();
+    const { fullname, phone, email, address, laptop } = contact.value;
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error(errorData);
-    } else {
-      const data = await response.json();
-      console.log("Here");
-      console.log(data);
-    }
+    const data = new FormData();
+    data.append("receipt", filePicked.value);
 
-    // clear the input field when after successful submission
+    const url = "https://testbackend-ya01.onrender.com/api/v1/users/register";
+    const params = {
+      fullname,
+      phone,
+      email,
+      address,
+      laptop,
+    };
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${url}?${new URLSearchParams(params)}`,
+      data,
+    };
+
+    loading.value = true;
+
+    axios
+      .request(config)
+      .then((response) => {
+        toast("Thank your for registering", {
+          autoClose: 3000,
+          theme: "light",
+          type: "success",
+          position: "top-center",
+          transition: "slide",
+        });
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        toast(error.response.data.message, {
+          autoClose: 3000,
+          theme: "light",
+          type: "error",
+          position: "top-center",
+          transition: "slide",
+        });
+        console.error(error);
+      });
     contact.value = {};
-
-    // Clear the filePicked ref after successful submission
-    filePicked.value = null;
-
-    toast("Thank your for registering", {
-      autoClose: 3000,
-      theme: "light",
-      type: "success",
-      position: "top-center",
-      transition: "slide",
-    });
-
-    loading.value = false;
-  } catch (error) {
-    toast(error.response.data.message, {
-      autoClose: 3000,
-      theme: "light",
-      type: "error",
-      position: "top-center",
-      transition: "slide",
-    });
-    console.error(error);
+  } catch (err) {
+    console.log(err);
+  } finally {
     loading.value = false;
   }
 };
@@ -159,7 +151,7 @@ const handleSubmit = async (e) => {
           <div class="contact-box__upload">
             <img
               src="../assets/icons/upload.svg"
-              class="upload cursor-pointer w-7 h-7"
+              class="cursor-pointer upload w-7 h-7"
               alt="upload"
             />
             <input
@@ -169,7 +161,7 @@ const handleSubmit = async (e) => {
               @change="handleFile"
             />
           </div>
-          <p class="text-xs">{{ filePicked }}</p>
+          <!-- <p class="text-xs text-black">{{ filePicked }}</p> -->
           <button class="btn" :disabled="loading" type="submit">
             <span v-if="loading" class="spinner"></span>
             <span v-else>Submit</span>
