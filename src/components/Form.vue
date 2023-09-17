@@ -31,6 +31,7 @@ const handleFile = (e) => {
 
 const handleSubmit = async (e) => {
   loading.value = true;
+
   try {
     e.preventDefault();
     const { fullname, phone, email, address, laptop } = contact.value;
@@ -65,6 +66,7 @@ const handleSubmit = async (e) => {
           transition: "slide",
         });
         console.log(JSON.stringify(response.data));
+        loading.value = false;
       })
       .catch((error) => {
         toast(error.response.data.message, {
@@ -75,12 +77,11 @@ const handleSubmit = async (e) => {
           transition: "slide",
         });
         console.error(error);
+        loading.value = false;
       });
     contact.value = {};
   } catch (err) {
     console.log(err);
-  } finally {
-    loading.value = false;
   }
 };
 </script>
@@ -160,7 +161,7 @@ const handleSubmit = async (e) => {
               @change="handleFile"
             />
           </div>
-          <!-- <p class="text-xs text-black">{{ filePicked }}</p> -->
+
           <button class="btn" :disabled="loading" type="submit">
             <span v-if="loading" class="spinner"></span>
             <span v-else>Submit</span>
