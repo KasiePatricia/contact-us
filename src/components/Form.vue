@@ -32,57 +32,53 @@ const handleFile = (e) => {
 const handleSubmit = async (e) => {
   loading.value = true;
 
-  try {
-    e.preventDefault();
-    const { fullname, phone, email, address, laptop } = contact.value;
+  e.preventDefault();
+  const { fullname, phone, email, address, laptop } = contact.value;
 
-    const data = new FormData();
-    data.append("receipt", filePicked.value);
+  const data = new FormData();
+  data.append("receipt", filePicked.value);
 
-    const url = "https://testbackend-ya01.onrender.com/api/v1/users/register";
-    const params = {
-      fullname,
-      phone,
-      email,
-      address,
-      laptop,
-    };
+  const url = "https://testbackend-ya01.onrender.com/api/v1/users/register";
+  const params = {
+    fullname,
+    phone,
+    email,
+    address,
+    laptop,
+  };
 
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: `${url}?${new URLSearchParams(params)}`,
-      data,
-    };
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${url}?${new URLSearchParams(params)}`,
+    data,
+  };
 
-    axios
-      .request(config)
-      .then((response) => {
-        toast("Thank your for registering", {
-          autoClose: 3000,
-          theme: "light",
-          type: "success",
-          position: "top-center",
-          transition: "slide",
-        });
-        console.log(JSON.stringify(response.data));
-        loading.value = false;
-      })
-      .catch((error) => {
-        toast(error.response.data.message, {
-          autoClose: 3000,
-          theme: "light",
-          type: "error",
-          position: "top-center",
-          transition: "slide",
-        });
-        console.error(error);
-        loading.value = false;
+  axios
+    .request(config)
+    .then((response) => {
+      toast("Thank your for registering", {
+        autoClose: 3000,
+        theme: "light",
+        type: "success",
+        position: "top-center",
+        transition: "slide",
       });
-    contact.value = {};
-  } catch (err) {
-    console.log(err);
-  }
+      console.log(JSON.stringify(response.data));
+      loading.value = false;
+    })
+    .catch((error) => {
+      toast(error.response.data.message, {
+        autoClose: 3000,
+        theme: "light",
+        type: "error",
+        position: "top-center",
+        transition: "slide",
+      });
+      console.error(error);
+      loading.value = false;
+    });
+  contact.value = {};
 };
 </script>
 
